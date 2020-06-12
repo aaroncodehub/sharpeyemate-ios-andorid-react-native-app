@@ -15,7 +15,7 @@ import {
     Alert,
     Dimensions,
     TouchableWithoutFeedback,
-    ScrollView
+    Linking
 } from 'react-native'
 
 import { LinearGradient } from 'expo-linear-gradient'
@@ -95,7 +95,7 @@ const Login = (props) => {
 
     return (
         <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : null}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
             style={styles.container}
         // keyboardVerticalOffset={Platform.select({ ios: Header.HEIGHT})}
         >
@@ -106,11 +106,11 @@ const Login = (props) => {
                         <TouchableOpacity style={styles.forwardArrow} onPress={() => props.navigation.goBack()}>
                             <Icon name="md-arrow-back" size={24} color={'white'} />
                         </TouchableOpacity>
-         
-                            <View style={styles.header}>
-                                <Text style={styles.text_header}>Enjoy Your Clear Vision</Text>
-                            </View>
-                      
+
+                        <View style={styles.header}>
+                            <Text style={styles.text_header}>Enjoy Your Clear Vision</Text>
+                        </View>
+
                         <Animatable.View
                             animation="fadeInUpBig"
                             style={styles.footer}>
@@ -186,6 +186,9 @@ const Login = (props) => {
                                         }
                                     </LinearGradient>
                                 </TouchableOpacity>
+                                <TouchableOpacity style={styles.signIn} onPress={() => Linking.openURL('http://sharpeye.co.nz/about.php')}>
+                                    <Text style={styles.textSignUp}>No Account ? Sign UP</Text>
+                                </TouchableOpacity>
                             </View>
                         </Animatable.View>
                     </ImageBackground>
@@ -214,7 +217,7 @@ const styles = StyleSheet.create({
     },
     header: {
         flex: 1,
-        justifyContent:"flex-end",
+        justifyContent: "flex-end",
         paddingHorizontal: 20,
         paddingBottom: 20
     },
@@ -269,6 +272,11 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
         color: 'white'
+    },
+    textSignUp: {
+        fontSize: 12,
+        fontWeight: 'bold',
+        color: '#05375a',
     },
     forwardArrow: {
         position: 'absolute',
