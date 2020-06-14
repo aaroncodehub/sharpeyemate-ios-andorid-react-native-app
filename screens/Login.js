@@ -187,7 +187,7 @@ const Login = (props) => {
                                     </LinearGradient>
                                 </TouchableOpacity>
                                 <TouchableOpacity style={styles.signIn} onPress={() => Linking.openURL('http://sharpeye.co.nz/about.php')}>
-                                    <Text style={styles.textSignUp}>No Account ? Sign UP</Text>
+                                    <Text style={styles.textSignUp}>Sign up for an account</Text>
                                 </TouchableOpacity>
                             </View>
                         </Animatable.View>
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
         color: 'white'
     },
     textSignUp: {
-        fontSize: 12,
+        fontSize: 14,
         fontWeight: 'bold',
         color: '#05375a',
     },
