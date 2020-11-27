@@ -84,34 +84,99 @@ export const fetchOrders = () => {
         const companyId = getState().myReducer.userProfile.companyId
         const accessToken = getState().myReducer.userProfile.accessToken
         const limited = getState().myReducer.userProfile.limitedOrder
-        axios({
-            url: 'https://api.sharpeye.co.nz/api/v1/model/sale.order/?limit=' + limited + '&detailed=True&domain=partner_id,=,' + companyId,
-            headers: {
-                'access_token': accessToken,
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'Cache-Control': 'no-cache'
-            },
-        }).then((res) => {
-            dispatch({
-                type: SET_ORDERS,
-                orders: res.data
+        const rank = getState().myReducer.userProfile.rank
+        const userId = getState().myReducer.userProfile.userId
+        // sharpeye user (no salesperson) access endpoint
+        if (rank == 2) {
+            axios({
+                url: 'http://api-test.sharpeye.co.nz/api/v1/model/sale.order/?limit=' + limited + '&detailed=True&domain=state,!=,cancel',
+                headers: {
+                    'access_token': accessToken,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Cache-Control': 'no-cache'
+                },
+            }).then((res) => {
+                dispatch({
+                    type: SET_ORDERS,
+                    orders: res.data
+                })
+            }).then(() => {
+                dispatch({
+                    type: LOADING,
+                    loading: false
+                })
+            }).catch(err => {
+                dispatch({
+                    type: ERROR_MESSAGE,
+                    errorMessage: err.message
+                })
+                dispatch({
+                    type: LOADING,
+                    loading: false
+                })
             })
-        }).then(() => {
-            dispatch({
-                type: LOADING,
-                loading: false
+            // salesperson of sharpeye access endpoint
+        } else if (rank == 3) {
+            axios({
+                url: 'http://api-test.sharpeye.co.nz/api/v1/model/sale.order/?limit=' + limited + '&detailed=True&domain=state,!=,cancel;user_id,=,' + userId,
+                headers: {
+                    'access_token': accessToken,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Cache-Control': 'no-cache'
+                },
+            }).then((res) => {
+                dispatch({
+                    type: SET_ORDERS,
+                    orders: res.data
+                })
+            }).then(() => {
+                dispatch({
+                    type: LOADING,
+                    loading: false
+                })
+            }).catch(err => {
+                dispatch({
+                    type: ERROR_MESSAGE,
+                    errorMessage: err.message
+                })
+                dispatch({
+                    type: LOADING,
+                    loading: false
+                })
             })
-        }).catch(err => {
-            dispatch({
-                type: ERROR_MESSAGE,
-                errorMessage: err.message
+            // normal customer access endpoint
+        } else {
+            axios({
+                url: 'http://api-test.sharpeye.co.nz/api/v1/model/sale.order/?limit=' + limited + '&detailed=True&domain=state,!=,cancel;partner_id,=,' + companyId,
+                headers: {
+                    'access_token': accessToken,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Cache-Control': 'no-cache'
+                },
+            }).then((res) => {
+                dispatch({
+                    type: SET_ORDERS,
+                    orders: res.data
+                })
+            }).then(() => {
+                dispatch({
+                    type: LOADING,
+                    loading: false
+                })
+            }).catch(err => {
+                dispatch({
+                    type: ERROR_MESSAGE,
+                    errorMessage: err.message
+                })
+                dispatch({
+                    type: LOADING,
+                    loading: false
+                })
             })
-            dispatch({
-                type: LOADING,
-                loading: false
-            })
-        })
+        }
     }
 }
 

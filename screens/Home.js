@@ -63,7 +63,13 @@ const Home = props => {
                 setOrders(filteredOrders)
             } else {
                 filteredOrders = myOrders.filter(order => {
-                    return order.name.match(searchString)
+                    if (order.name.match(searchString)) {
+                        return order.name.match(searchString)
+                    } else if (order.client_order_ref) {
+                        return order.client_order_ref.match(searchString)
+                    } else {
+                        return false
+                    }
                 })
                 setOrders(filteredOrders)
             }
@@ -168,7 +174,8 @@ const Home = props => {
                         </View>
                         <View style={{ flex: 8 }}>
                             <View>
-                                <Text gray2 caption>{moment(item.date_order).fromNow()}</Text>
+                                {/* <Text gray2 caption>{moment(item.date_order).fromNow()}</Text> */}
+                                <Text caption style={styles.title}>{item.client_order_ref}</Text>
                             </View>
                             <View style={{ flexDirection: 'row' }}>
                                 <Text gray2 caption style={styles.title}>
@@ -223,7 +230,7 @@ const Home = props => {
                                 style={styles.inputSearch}
                                 onChangeText={text => setSearchString(text)}
                                 value={searchString}
-                                keyboardType='numeric'
+                                // keyboardType='numeric'
                             />
                             <TouchableOpacity onPress={() => setSearchString(null)}
                                 style={styles.buttonSearch}

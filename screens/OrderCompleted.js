@@ -15,7 +15,6 @@ import {
 import { useSelector } from 'react-redux'
 import 'firebase/firestore';
 import { Ionicons } from "@expo/vector-icons";
-import moment from "moment";
 import BackgroundCurve from '../components/BackgroundCurve';
 import { Feather } from "@expo/vector-icons";
 
@@ -35,8 +34,14 @@ const OrderCompleted = props => {
     let filteredOrders = []
 
     if (completedOrders) {
-        filteredOrders = orders.filter(order => {
-            return order.name.match(searchString)
+        filteredOrders = completedOrders.filter(order => {
+            if (order.name.match(searchString)) {
+                return order.name.match(searchString)
+            } else if (order.client_order_ref) {
+                return order.client_order_ref.match(searchString)
+            } else {
+                return false
+            }
         })
     }
 
@@ -53,7 +58,7 @@ const OrderCompleted = props => {
                         </View>
                         <View style={{ flex: 8 }}>
                             <View>
-                                <Text gray2 caption>{moment(item.date_order).fromNow()}</Text>
+                                <Text caption style={styles.title}>{item.client_order_ref}</Text>
                             </View>
                             <View style={{ flexDirection: 'row' }}>
                                 <Text gray2 caption style={styles.title}>
@@ -84,23 +89,23 @@ const OrderCompleted = props => {
         if (completedOrders) {
             return (
                 <FlatList
-                        style={styles.feed}
-                        data={completedOrders}
-                        renderItem={renderOrder}
-                        initialNumToRender={6}
-                        maxToRenderPerBatch={10}
-                        windowSize={10}
-                        keyExtractor={item => item.name}
-                        showsVerticalScrollIndicator={false}
-                    ></FlatList>
+                    style={styles.feed}
+                    data={completedOrders}
+                    renderItem={renderOrder}
+                    initialNumToRender={6}
+                    maxToRenderPerBatch={10}
+                    windowSize={10}
+                    keyExtractor={item => item.name}
+                    showsVerticalScrollIndicator={false}
+                ></FlatList>
             )
         } else {
             return (
                 <View style={styles.loading}>
-                <Text center caption gray style={{ marginBottom: 20 }}>
-                    Oops ! no completed order found or it is still loading...
+                    <Text center caption gray style={{ marginBottom: 20 }}>
+                        Oops ! no completed order found or it is still loading...
                 </Text>
-            </View>
+                </View>
             )
         }
     }
@@ -127,7 +132,6 @@ const OrderCompleted = props => {
                                 style={styles.inputSearch}
                                 onChangeText={text => setSearchString(text)}
                                 value={searchString}
-                                keyboardType='numeric'
                             />
                             <TouchableOpacity onPress={() => setSearchString(null)}
                                 style={styles.buttonSearch}

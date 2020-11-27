@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useSelector } from 'react-redux';
 import {
     View,
     StyleSheet,
@@ -6,7 +7,8 @@ import {
     LayoutAnimation,
     FlatList,
     ImageBackground,
-    ScrollView
+    ScrollView,
+    SafeAreaView
 } from "react-native";
 
 import {
@@ -16,11 +18,42 @@ import {
 import { Text, Button, Block } from '../components';
 import { theme } from '../constants';
 import { Ionicons } from "@expo/vector-icons";
+import axios from 'axios'
+
+
 
 const OrderDetails = props => {
     const bgImage = require('../assets/header.jpg')
     LayoutAnimation.easeInEaseOut()
     order = props.navigation.getParam('item')
+    const profile = useSelector(state => state.myReducer.userProfile)
+
+    useEffect(() => {
+        axios({
+            method: "GET",
+            url:
+              "http://api-test.sharpeye.co.nz/api/v1/model/sale.order/" +
+              order.id +
+              "/attachments?all_attachments=True",
+            headers: {
+              "access_token": profile.accessToken,
+              "Accept": "application/json",
+              "Content-Type": "application/json",
+            },
+          })
+            .then((response) => {
+              
+              if (response.data.attachments.length !== 0) {
+                console.log('drawing exist')
+              } else {
+                console.log('no drawing')
+              }
+            })
+            .catch((err) => {
+               console.log(err.message)
+            });
+    },[order.id])
+
     renderOrderLine = orderLine => {
         if (
             orderLine.product_id[0] == 2380 ||
@@ -70,6 +103,14 @@ const OrderDetails = props => {
                     <View style={{ alignItems: 'center' }}>
                         <Ionicons name='ios-speedometer' size={36} color='#2980b9' />
                         <Text semibold>{order.manufacturing_status_of_sales_order}</Text>
+                    </View>
+                    <View style={{ alignItems: 'center' }}>
+                        <Ionicons name='md-cloud-download' size={36} color='#2980b9' />
+                        <Text semibold>Drawings</Text>
+                    </View>
+                    <View style={{ alignItems: 'center' }}>
+                        <Ionicons name='ios-alarm' size={36} color='#2980b9' />
+                        <Text semibold>Booking</Text>
                     </View>
                 </View>
                 <View style={styles.feedItem}>
@@ -128,9 +169,12 @@ const OrderDetails = props => {
                     <Text center h2 bold white>{order.name}</Text>
                 </Block>
             </ImageBackground>
-            <ScrollView style={styles.feed}>
+            {/* <ScrollView style={styles.feed}>
                 {renderOrder(order)}
-            </ScrollView>
+            </ScrollView> */}
+            <SafeAreaView style={{ ...styles.feed, flex:1 }}>
+                {renderOrder(order)}
+            </SafeAreaView>
         </View>
     );
 

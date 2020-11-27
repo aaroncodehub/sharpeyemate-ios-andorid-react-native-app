@@ -33,7 +33,7 @@ const Search = props => {
         setLoading(true)
         if (searchText) {
             axios({
-                url: 'https://api.sharpeye.co.nz/api/v1/model/sale.order/?detailed=True&limit=1&domain=name,ilike,' + searchText,
+                url: 'http://api-test.sharpeye.co.nz/api/v1/model/sale.order/?detailed=True&limit=1&domain=name,ilike,' + searchText,
                 headers: {
                     'access_token': profile.accessToken,
                     'Accept': 'application/json',
@@ -41,11 +41,22 @@ const Search = props => {
                 },
             }).then(res => {
                 setLoading(false)
-                if ((res.data[0] !== undefined) && (profile.companyId == res.data[0].partner_id.id)) {
-                    props.navigation.navigate('SearchDetails', { searchedOrder: res.data[0] })
+                //  do not check partner_id for sharpeye user
+                if (profile.rank >= 2) {
+                    if ((res.data[0] !== undefined)) {
+                        props.navigation.navigate('SearchDetails', { searchedOrder: res.data[0] })
+                    } else {
+                        Alert.alert('Oops !', 'no order found. please make sure the order number is correct .', [{ text: 'OK' }]);
+                        Keyboard.dismiss()
+                    }
+                // check partner_id for customer avoiding searching other cusotmer's order by accident. 
                 } else {
-                    Alert.alert('Oops !', 'no order found. please make sure the order number is correct .', [{ text: 'OK' }]);
-                    Keyboard.dismiss()
+                    if ((res.data[0] !== undefined) && (profile.companyId == res.data[0].partner_id.id)) {
+                        props.navigation.navigate('SearchDetails', { searchedOrder: res.data[0] })
+                    } else {
+                        Alert.alert('Oops !', 'no order found. please make sure the order number is correct .', [{ text: 'OK' }]);
+                        Keyboard.dismiss()
+                    }
                 }
             }).catch(err => {
                 setLoading(false)

@@ -71,6 +71,14 @@ const SearchDetails = props => {
                         <Ionicons name='ios-speedometer' size={36} color='#2980b9' />
                         <Text semibold>{order.manufacturing_status_of_sales_order}</Text>
                     </View>
+                    <View style={{ alignItems: 'center' }}>
+                        <Ionicons name='md-cloud-download' size={36} color='#2980b9' />
+                        <Text semibold>Drawings</Text>
+                    </View>
+                    <View style={{ alignItems: 'center' }}>
+                        <Ionicons name='ios-alarm' size={36} color='#2980b9' />
+                        <Text semibold>Booking</Text>
+                    </View>
                 </View>
                 <View style={styles.feedItem}>
                     <View style={{ flex: 1 }}>
