@@ -13,3 +13,7 @@ web-report/
 *.ipa
 *.psd
 *.ini
+*.txt
+*.log
+*.lock
+*.jks
