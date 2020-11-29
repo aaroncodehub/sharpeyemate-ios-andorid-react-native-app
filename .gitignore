@@ -1,9 +1,8 @@
 node_modules/**/*
 .expo/*
 npm-debug.*
+*.txt
 *.jks
-*.p8
-*.p12
 *.key
 *.mobileprovision
 *.orig.*
@@ -13,7 +12,6 @@ web-report/
 *.ipa
 *.psd
 *.ini
-*.txt
+*.0.txt
 *.log
 *.lock
-*.jks
