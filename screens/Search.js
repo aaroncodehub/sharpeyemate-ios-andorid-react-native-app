@@ -33,7 +33,7 @@ const Search = props => {
         setLoading(true)
         if (searchText) {
             axios({
-                url: 'http://api-test.sharpeye.co.nz/api/v1/model/sale.order/?detailed=True&limit=1&domain=name,ilike,' + searchText,
+                url: 'https://api.sharpeye.co.nz/api/v1/model/sale.order/?detailed=True&limit=1&domain=name,ilike,' + searchText,
                 headers: {
                     'access_token': profile.accessToken,
                     'Accept': 'application/json',

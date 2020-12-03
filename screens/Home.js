@@ -63,10 +63,10 @@ const Home = props => {
                 setOrders(filteredOrders)
             } else {
                 filteredOrders = myOrders.filter(order => {
-                    if (order.name.match(searchString)) {
-                        return order.name.match(searchString)
+                    if (order.name.toLowerCase().match(searchString.toLowerCase())) {
+                        return order.name.toLowerCase().match(searchString.toLowerCase())
                     } else if (order.client_order_ref) {
-                        return order.client_order_ref.match(searchString)
+                        return order.client_order_ref.toLowerCase().match(searchString.toLowerCase())
                     } else {
                         return false
                     }

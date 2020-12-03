@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState } from "react";
 import { useSelector } from 'react-redux';
 import {
     View,
@@ -8,7 +8,9 @@ import {
     FlatList,
     ImageBackground,
     ScrollView,
-    SafeAreaView
+    SafeAreaView,
+    Alert,
+    ActivityIndicator
 } from "react-native";
 
 import {
@@ -19,7 +21,8 @@ import { Text, Button, Block } from '../components';
 import { theme } from '../constants';
 import { Ionicons } from "@expo/vector-icons";
 import axios from 'axios'
-
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
 
 
 const OrderDetails = props => {
@@ -27,32 +30,42 @@ const OrderDetails = props => {
     LayoutAnimation.easeInEaseOut()
     order = props.navigation.getParam('item')
     const profile = useSelector(state => state.myReducer.userProfile)
+    const [loading, setLoading] = useState(false)
 
-    useEffect(() => {
+    const handleDownload = () => {
+        setLoading(true)
         axios({
             method: "GET",
             url:
-              "http://api-test.sharpeye.co.nz/api/v1/model/sale.order/" +
-              order.id +
-              "/attachments?all_attachments=True",
+                "https://api.sharpeye.co.nz/api/v1/model/sale.order/" +
+                order.id +
+                "/attachments?all_attachments=True",
             headers: {
-              "access_token": profile.accessToken,
-              "Accept": "application/json",
-              "Content-Type": "application/json",
+                "access_token": profile.accessToken,
+                "Accept": "application/json",
+                "Content-Type": "application/json",
             },
-          })
+        })
             .then((response) => {
-              
-              if (response.data.attachments.length !== 0) {
-                console.log('drawing exist')
-              } else {
-                console.log('no drawing')
-              }
+
+                if (response.data.attachments.length !== 0) {
+                    const fileName = response.data.attachments[0].name
+                    const base64Code = response.data.attachments[0].base64
+                    const fileUri = FileSystem.documentDirectory + `${encodeURI(fileName)}`
+                    FileSystem.writeAsStringAsync(fileUri, base64Code, { encoding: FileSystem.EncodingType.Base64 });
+                    Sharing.shareAsync(fileUri);
+                    setLoading(false)
+                    // const mediaResult = await MediaLibrary.saveToLibraryAsync(filename);
+                } else {
+                    setLoading(false)
+                    Alert.alert('Oops !', 'no drawing exists', [{ text: 'OK' }]);
+                }
             })
             .catch((err) => {
-               console.log(err.message)
+                setLoading(false)
+                console.log(err.message)
             });
-    },[order.id])
+    }
 
     renderOrderLine = orderLine => {
         if (
@@ -74,7 +87,7 @@ const OrderDetails = props => {
         ) {
             return (
                 <View style={styles.feedItem}>
-                    <View style={{ flex: 1, flexDirection: "row", alignItems: 'center' , justifyContent:'space-around'}}>
+                    <View style={{ flex: 1, flexDirection: "row", alignItems: 'center', justifyContent: 'space-around' }}>
                         <View>
                             <Text h4 bold>{orderLine.name}</Text>
                         </View>
@@ -104,14 +117,20 @@ const OrderDetails = props => {
                         <Ionicons name='ios-speedometer' size={36} color='#2980b9' />
                         <Text semibold>{order.manufacturing_status_of_sales_order}</Text>
                     </View>
-                    <View style={{ alignItems: 'center' }}>
-                        <Ionicons name='md-cloud-download' size={36} color='#2980b9' />
-                        <Text semibold>Drawings</Text>
-                    </View>
-                    <View style={{ alignItems: 'center' }}>
+                    <TouchableOpacity style={{ alignItems: 'center' }} onPress={handleDownload}>
+                        {loading ? <View>
+                            <ActivityIndicator size='large' color={theme.colors.primary} />
+                        </View> :
+                            <View>
+                                <Ionicons name='md-cloud-download' size={36} color='#2980b9' />
+                                <Text semibold>Drawings</Text>
+                            </View>
+                        }
+                    </TouchableOpacity>
+                    {/* <View style={{ alignItems: 'center' }}>
                         <Ionicons name='ios-alarm' size={36} color='#2980b9' />
                         <Text semibold>Booking</Text>
-                    </View>
+                    </View> */}
                 </View>
                 <View style={styles.feedItem}>
                     <View style={{ flex: 1 }}>
@@ -122,6 +141,9 @@ const OrderDetails = props => {
                         <View style={styles.details}>
                             <Text style={styles.text}>Customer Request</Text>
                             <Text gray caption center style={styles.text}>{order.customer_request}</Text>
+                        </View><View style={styles.details}>
+                            <Text style={styles.text}>Sharpeye Note</Text>
+                            <Text gray caption center style={styles.text}>{order.app_memo}</Text>
                         </View>
                         <View style={styles.details}>
                             <Text style={styles.text}>Contact Name</Text>
@@ -140,7 +162,7 @@ const OrderDetails = props => {
                             <Text style={styles.text}>Shipping Address</Text>
                         </View>
                         <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-                            <Text gray caption center style={styles.text}>{order.alternate_shipping_address}</Text>
+                            <Text gray caption right style={styles.text}>{order.alternate_shipping_address}</Text>
                         </View>
                     </View>
                 </View>
@@ -172,7 +194,7 @@ const OrderDetails = props => {
             {/* <ScrollView style={styles.feed}>
                 {renderOrder(order)}
             </ScrollView> */}
-            <SafeAreaView style={{ ...styles.feed, flex:1 }}>
+            <SafeAreaView style={{ ...styles.feed, flex: 1 }}>
                 {renderOrder(order)}
             </SafeAreaView>
         </View>

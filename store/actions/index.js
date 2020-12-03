@@ -89,7 +89,7 @@ export const fetchOrders = () => {
         // sharpeye user (no salesperson) access endpoint
         if (rank == 2) {
             axios({
-                url: 'http://api-test.sharpeye.co.nz/api/v1/model/sale.order/?limit=' + limited + '&detailed=True&domain=state,!=,cancel',
+                url: 'https://api.sharpeye.co.nz/api/v1/model/sale.order/?limit=' + limited + '&detailed=True&domain=state,!=,cancel',
                 headers: {
                     'access_token': accessToken,
                     'Accept': 'application/json',
@@ -119,7 +119,7 @@ export const fetchOrders = () => {
             // salesperson of sharpeye access endpoint
         } else if (rank == 3) {
             axios({
-                url: 'http://api-test.sharpeye.co.nz/api/v1/model/sale.order/?limit=' + limited + '&detailed=True&domain=state,!=,cancel;user_id,=,' + userId,
+                url: 'https://api.sharpeye.co.nz/api/v1/model/sale.order/?limit=' + limited + '&detailed=True&domain=state,!=,cancel;user_id,=,' + userId,
                 headers: {
                     'access_token': accessToken,
                     'Accept': 'application/json',
@@ -149,7 +149,7 @@ export const fetchOrders = () => {
             // normal customer access endpoint
         } else {
             axios({
-                url: 'http://api-test.sharpeye.co.nz/api/v1/model/sale.order/?limit=' + limited + '&detailed=True&domain=state,!=,cancel;partner_id,=,' + companyId,
+                url: 'https://api.sharpeye.co.nz/api/v1/model/sale.order/?limit=' + limited + '&detailed=True&domain=state,!=,cancel;partner_id,=,' + companyId,
                 headers: {
                     'access_token': accessToken,
                     'Accept': 'application/json',
