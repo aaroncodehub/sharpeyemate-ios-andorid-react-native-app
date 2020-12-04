@@ -7,10 +7,10 @@ import {
     LayoutAnimation,
     FlatList,
     ImageBackground,
-    ScrollView,
     SafeAreaView,
     Alert,
-    ActivityIndicator
+    ActivityIndicator,
+    Modal,
 } from "react-native";
 
 import {
@@ -31,6 +31,8 @@ const OrderDetails = props => {
     order = props.navigation.getParam('item')
     const profile = useSelector(state => state.myReducer.userProfile)
     const [loading, setLoading] = useState(false)
+    const [modalVisible, setModalVisible] = useState(false);
+    const [drawings, setDrawings] = useState(null)
 
     const handleDownload = () => {
         setLoading(true)
@@ -49,11 +51,13 @@ const OrderDetails = props => {
             .then((response) => {
 
                 if (response.data.attachments.length !== 0) {
-                    const fileName = response.data.attachments[0].name
-                    const base64Code = response.data.attachments[0].base64
-                    const fileUri = FileSystem.documentDirectory + `${encodeURI(fileName)}`
-                    FileSystem.writeAsStringAsync(fileUri, base64Code, { encoding: FileSystem.EncodingType.Base64 });
-                    Sharing.shareAsync(fileUri);
+                    setDrawings(response.data.attachments)
+                    setModalVisible(true)
+                    // const fileName = response.data.attachments[0].name
+                    // const base64Code = response.data.attachments[0].base64
+                    // const fileUri = FileSystem.documentDirectory + `${encodeURI(fileName)}`
+                    // FileSystem.writeAsStringAsync(fileUri, base64Code, { encoding: FileSystem.EncodingType.Base64 });
+                    // Sharing.shareAsync(fileUri);
                     setLoading(false)
                     // const mediaResult = await MediaLibrary.saveToLibraryAsync(filename);
                 } else {
@@ -65,6 +69,13 @@ const OrderDetails = props => {
                 setLoading(false)
                 console.log(err.message)
             });
+    }
+
+    const handleDownloadDrawing = (name, base64Code) => {
+        const fileUri = FileSystem.documentDirectory + `${encodeURI(name)}`
+        FileSystem.writeAsStringAsync(fileUri, base64Code, { encoding: FileSystem.EncodingType.Base64 });
+        Sharing.shareAsync(fileUri);
+        
     }
 
     renderOrderLine = orderLine => {
@@ -123,9 +134,9 @@ const OrderDetails = props => {
                         </View> :
                             <View>
                                 <Ionicons name='md-cloud-download' size={36} color='#2980b9' />
-                                <Text semibold>Drawings</Text>
                             </View>
                         }
+                        <Text semibold>Drawings</Text>
                     </TouchableOpacity>
                     {/* <View style={{ alignItems: 'center' }}>
                         <Ionicons name='ios-alarm' size={36} color='#2980b9' />
@@ -197,6 +208,36 @@ const OrderDetails = props => {
             <SafeAreaView style={{ ...styles.feed, flex: 1 }}>
                 {renderOrder(order)}
             </SafeAreaView>
+
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => {
+                    Alert.alert('Modal has been closed.');
+                }}>
+                <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+
+                        {
+                            drawings?.map((drawing, index) => (
+                                <TouchableOpacity onPress={() => handleDownloadDrawing(drawing.name, drawing.base64)} key={index}>
+                                    <Text style={styles.modalText}>{drawing.name}</Text>
+                                </TouchableOpacity>
+                            ))
+                        }
+
+                        <TouchableOpacity
+                            style={{ ...styles.openButton, backgroundColor: '#2980b9' }}
+                            onPress={() => {
+                                setModalVisible(!modalVisible);
+                            }}>
+                            <Text style={styles.textStyle}>Close</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+
         </View>
     );
 
@@ -257,7 +298,48 @@ const styles = StyleSheet.create({
     text: {
         marginVertical: 6,
         alignSelf: "flex-end"
-    }
+    },
+
+
+    centeredView: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 22,
+    },
+    modalView: {
+        margin: 20,
+        backgroundColor: 'white',
+        borderRadius: 10,
+        padding: 35,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+    },
+    openButton: {
+        borderRadius: 100,
+        paddingTop:10,
+        paddingBottom:10,
+        paddingLeft:20,
+        paddingRight:20,
+        elevation: 2,
+    },
+    textStyle: {
+        color: 'white',
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+    modalText: {
+
+        marginBottom: 20,
+        textAlign: 'center',
+    },
 
 });
 

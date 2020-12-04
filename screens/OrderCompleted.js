@@ -10,7 +10,7 @@ import {
     Keyboard,
     StatusBar,
     TextInput,
-    ActivityIndicator
+    
 } from "react-native";
 import { useSelector } from 'react-redux'
 import 'firebase/firestore';
