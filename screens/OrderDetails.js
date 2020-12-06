@@ -7,7 +7,6 @@ import {
     LayoutAnimation,
     FlatList,
     ImageBackground,
-    SafeAreaView,
     Alert,
     ActivityIndicator,
     Modal,
@@ -17,7 +16,7 @@ import {
 
     AntDesign
 } from "@expo/vector-icons";
-import { Text, Button, Block } from '../components';
+import { Text, Block } from '../components';
 import { theme } from '../constants';
 import { Ionicons } from "@expo/vector-icons";
 import axios from 'axios'
@@ -75,7 +74,7 @@ const OrderDetails = props => {
         const fileUri = FileSystem.documentDirectory + `${encodeURI(name)}`
         FileSystem.writeAsStringAsync(fileUri, base64Code, { encoding: FileSystem.EncodingType.Base64 });
         Sharing.shareAsync(fileUri);
-        
+
     }
 
     renderOrderLine = orderLine => {
@@ -118,74 +117,74 @@ const OrderDetails = props => {
     }
     renderOrder = order => {
         return (
-            <View>
-                <View style={{ ...styles.feedItem, flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <View style={{ alignItems: 'center' }}>
-                        <Ionicons name='ios-create' size={36} color='#2980b9' />
-                        <Text semibold>{order.sales_order_status}</Text>
-                    </View>
-                    <View style={{ alignItems: 'center' }}>
-                        <Ionicons name='ios-speedometer' size={36} color='#2980b9' />
-                        <Text semibold>{order.manufacturing_status_of_sales_order}</Text>
-                    </View>
-                    <TouchableOpacity style={{ alignItems: 'center' }} onPress={handleDownload}>
-                        {loading ? <View>
-                            <ActivityIndicator size='large' color={theme.colors.primary} />
-                        </View> :
-                            <View>
-                                <Ionicons name='md-cloud-download' size={36} color='#2980b9' />
+            <FlatList
+                ListHeaderComponent={
+                    <>
+                        <View style={{ ...styles.feedItem, flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <View style={{ alignItems: 'center' }}>
+                                <Ionicons name='ios-create' size={36} color='#2980b9' />
+                                <Text semibold>{order.sales_order_status}</Text>
                             </View>
-                        }
-                        <Text semibold>Drawings</Text>
-                    </TouchableOpacity>
-                    {/* <View style={{ alignItems: 'center' }}>
-                        <Ionicons name='ios-alarm' size={36} color='#2980b9' />
-                        <Text semibold>Booking</Text>
-                    </View> */}
-                </View>
-                <View style={styles.feedItem}>
-                    <View style={{ flex: 1 }}>
-                        <View style={styles.details}>
-                            <Text style={styles.text}>Reference</Text>
-                            <Text gray caption center style={styles.text}>{order.client_order_ref}</Text>
-                        </View>
-                        <View style={styles.details}>
-                            <Text style={styles.text}>Customer Request</Text>
-                            <Text gray caption center style={styles.text}>{order.customer_request}</Text>
-                        </View><View style={styles.details}>
-                            <Text style={styles.text}>Sharpeye Note</Text>
-                            <Text gray caption center style={styles.text}>{order.app_memo}</Text>
-                        </View>
-                        <View style={styles.details}>
-                            <Text style={styles.text}>Contact Name</Text>
-                            <Text gray caption center style={styles.text}>{order.contact_name}</Text>
-                        </View>
-                        <View style={styles.details}>
-                            <Text style={styles.text}>Contact Phone</Text>
-                            <Text gray caption center style={styles.text}>{order.mobile}</Text>
-                        </View>
-                        <View style={styles.details}>
-                            <Text style={styles.text}>Deliver Method</Text>
-                            <Text gray caption center style={styles.text}>{order.delivery_method}</Text>
-                        </View>
+                            <View style={{ alignItems: 'center' }}>
+                                <Ionicons name='ios-speedometer' size={36} color='#2980b9' />
+                                <Text semibold>{order.manufacturing_status_of_sales_order}</Text>
+                            </View>
+                            <TouchableOpacity style={{ alignItems: 'center' }} onPress={handleDownload}>
+                                {loading ? <View>
+                                    <ActivityIndicator size='large' color={theme.colors.primary} />
+                                </View> :
+                                    <View>
+                                        <Ionicons name='md-cloud-download' size={36} color='#2980b9' />
+                                    </View>
+                                }
+                                <Text semibold>drawings</Text>
+                            </TouchableOpacity>
 
-                        <View style={styles.details}>
-                            <Text style={styles.text}>Shipping Address</Text>
                         </View>
-                        <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-                            <Text gray caption right style={styles.text}>{order.alternate_shipping_address}</Text>
+                        <View style={styles.feedItem}>
+                            <View style={{ flex: 1 }}>
+                                <View style={styles.details}>
+                                    <Text style={styles.text}>Reference</Text>
+                                    <Text gray caption center style={styles.text}>{order.client_order_ref}</Text>
+                                </View>
+                                <View style={styles.details}>
+                                    <Text style={styles.text}>Customer Request</Text>
+                                    <Text gray caption center style={styles.text}>{order.customer_request}</Text>
+                                </View>
+                                <View style={styles.details}>
+                                    <Text style={styles.text}>Sharpeye Note</Text>
+                                    <Text gray caption center style={styles.text}>{order.app_memo}</Text>
+                                </View>
+                                <View style={styles.details}>
+                                    <Text style={styles.text}>Contact Name</Text>
+                                    <Text gray caption center style={styles.text}>{order.contact_name}</Text>
+                                </View>
+                                <View style={styles.details}>
+                                    <Text style={styles.text}>Contact Phone</Text>
+                                    <Text gray caption center style={styles.text}>{order.mobile}</Text>
+                                </View>
+                                <View style={styles.details}>
+                                    <Text style={styles.text}>Deliver Method</Text>
+                                    <Text gray caption center style={styles.text}>{order.delivery_method}</Text>
+                                </View>
+
+                                <View style={styles.details}>
+                                    <Text style={styles.text}>Shipping Address</Text>
+                                </View>
+                                <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+                                    <Text gray caption center style={styles.text}>{order.alternate_shipping_address}</Text>
+                                </View>
+
+
+                            </View>
                         </View>
-                    </View>
-                </View>
-                <View>
-                    <FlatList
-                        data={order.order_line}
-                        renderItem={({ item }) => renderOrderLine(item)}
-                        keyExtractor={item => item.id.toString()}
-                        showsVerticalScrollIndicator={false}
-                    ></FlatList>
-                </View>
-            </View>
+                    </>
+                }
+                data={order.order_line}
+                renderItem={({ item }) => renderOrderLine(item)}
+                keyExtractor={item => item.id.toString()}
+                showsVerticalScrollIndicator={false}
+            ></FlatList>
         )
     };
 
@@ -205,9 +204,9 @@ const OrderDetails = props => {
             {/* <ScrollView style={styles.feed}>
                 {renderOrder(order)}
             </ScrollView> */}
-            <SafeAreaView style={{ ...styles.feed, flex: 1 }}>
+            <View style={{ ...styles.feed, flex: 1 }}>
                 {renderOrder(order)}
-            </SafeAreaView>
+            </View>
 
             <Modal
                 animationType="fade"
@@ -324,10 +323,10 @@ const styles = StyleSheet.create({
     },
     openButton: {
         borderRadius: 100,
-        paddingTop:10,
-        paddingBottom:10,
-        paddingLeft:20,
-        paddingRight:20,
+        paddingTop: 10,
+        paddingBottom: 10,
+        paddingLeft: 20,
+        paddingRight: 20,
         elevation: 2,
     },
     textStyle: {

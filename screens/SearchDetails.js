@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     View,
     StyleSheet,
@@ -6,19 +6,72 @@ import {
     LayoutAnimation,
     FlatList,
     ImageBackground,
-    ScrollView
+    ActivityIndicator,
+    Modal,
 } from "react-native";
-
+import { useSelector } from 'react-redux'
+import axios from 'axios'
 import { AntDesign } from "@expo/vector-icons";
 import { Text, Block } from '../components';
 import { theme } from '../constants';
 import { Ionicons } from "@expo/vector-icons";
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
 
 const SearchDetails = props => {
     LayoutAnimation.easeInEaseOut()
     const bgImage = require('../assets/header.jpg')
     order = props.navigation.getParam('searchedOrder')
-    
+    const profile = useSelector(state => state.myReducer.userProfile)
+
+    const [loading, setLoading] = useState(false)
+    const [modalVisible, setModalVisible] = useState(false);
+    const [drawings, setDrawings] = useState(null)
+
+    const handleDownload = () => {
+        setLoading(true)
+        axios({
+            method: "GET",
+            url:
+                "https://api.sharpeye.co.nz/api/v1/model/sale.order/" +
+                order.id +
+                "/attachments?all_attachments=True",
+            headers: {
+                "access_token": profile.accessToken,
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+            },
+        })
+            .then((response) => {
+
+                if (response.data.attachments.length !== 0) {
+                    setDrawings(response.data.attachments)
+                    setModalVisible(true)
+                    // const fileName = response.data.attachments[0].name
+                    // const base64Code = response.data.attachments[0].base64
+                    // const fileUri = FileSystem.documentDirectory + `${encodeURI(fileName)}`
+                    // FileSystem.writeAsStringAsync(fileUri, base64Code, { encoding: FileSystem.EncodingType.Base64 });
+                    // Sharing.shareAsync(fileUri);
+                    setLoading(false)
+                    // const mediaResult = await MediaLibrary.saveToLibraryAsync(filename);
+                } else {
+                    setLoading(false)
+                    Alert.alert('Oops !', 'no drawing exists', [{ text: 'OK' }]);
+                }
+            })
+            .catch((err) => {
+                setLoading(false)
+                console.log(err.message)
+            });
+    }
+
+    const handleDownloadDrawing = (name, base64Code) => {
+        const fileUri = FileSystem.documentDirectory + `${encodeURI(name)}`
+        FileSystem.writeAsStringAsync(fileUri, base64Code, { encoding: FileSystem.EncodingType.Base64 });
+        Sharing.shareAsync(fileUri);
+
+    }
+
     renderOrderLine = orderLine => {
         if (
             orderLine.product_id[0] == 2380 ||
@@ -39,7 +92,7 @@ const SearchDetails = props => {
         ) {
             return (
                 <View style={styles.feedItem}>
-                    <View style={{ flex: 1, flexDirection: "row", alignItems: 'center' , justifyContent:'space-around'}}>
+                    <View style={{ flex: 1, flexDirection: "row", alignItems: 'center', justifyContent: 'space-around' }}>
                         <View>
                             <Text h4 bold>{orderLine.name}</Text>
                         </View>
@@ -57,71 +110,80 @@ const SearchDetails = props => {
             )
         }
     }
-    
+
 
     renderOrder = order => {
         return (
-            <View>
-                <View style={{ ...styles.feedItem, flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <View style={{ alignItems: 'center' }}>
-                        <Ionicons name='ios-create' size={36} color='#2980b9' />
-                        <Text semibold>{order.sales_order_status}</Text>
-                    </View>
-                    <View style={{ alignItems: 'center' }}>
-                        <Ionicons name='ios-speedometer' size={36} color='#2980b9' />
-                        <Text semibold>{order.manufacturing_status_of_sales_order}</Text>
-                    </View>
-                    <View style={{ alignItems: 'center' }}>
-                        <Ionicons name='md-cloud-download' size={36} color='#2980b9' />
-                        <Text semibold>Drawings</Text>
-                    </View>
-                    <View style={{ alignItems: 'center' }}>
-                        <Ionicons name='ios-alarm' size={36} color='#2980b9' />
-                        <Text semibold>Booking</Text>
-                    </View>
-                </View>
-                <View style={styles.feedItem}>
-                    <View style={{ flex: 1 }}>
-                        <View style={styles.details}>
-                            <Text style={styles.text}>Reference</Text>
-                            <Text gray caption center style={styles.text}>{order.client_order_ref}</Text>
-                        </View>
-                        <View style={styles.details}>
-                            <Text style={styles.text}>Customer Request</Text>
-                            <Text gray caption center style={styles.text}>{order.customer_request}</Text>
-                        </View>
-                        <View style={styles.details}>
-                            <Text style={styles.text}>Contact Name</Text>
-                            <Text gray caption center style={styles.text}>{order.contact_name}</Text>
-                        </View>
-                        <View style={styles.details}>
-                            <Text style={styles.text}>Contact Phone</Text>
-                            <Text gray caption center style={styles.text}>{order.mobile}</Text>
-                        </View>
-                        <View style={styles.details}>
-                            <Text style={styles.text}>Deliver Method</Text>
-                            <Text gray caption center style={styles.text}>{order.delivery_method}</Text>
-                        </View>
 
-                        <View style={styles.details}>
-                            <Text style={styles.text}>Shipping Address</Text>
+            <FlatList
+                ListHeaderComponent={
+                    <>
+                        <View style={{ ...styles.feedItem, flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <View style={{ alignItems: 'center' }}>
+                                <Ionicons name='ios-create' size={36} color='#2980b9' />
+                                <Text semibold>{order.sales_order_status}</Text>
+                            </View>
+                            <View style={{ alignItems: 'center' }}>
+                                <Ionicons name='ios-speedometer' size={36} color='#2980b9' />
+                                <Text semibold>{order.manufacturing_status_of_sales_order}</Text>
+                            </View>
+                            <TouchableOpacity style={{ alignItems: 'center' }} onPress={handleDownload}>
+                                {loading ? <View>
+                                    <ActivityIndicator size='large' color={theme.colors.primary} />
+                                </View> :
+                                    <View>
+                                        <Ionicons name='md-cloud-download' size={36} color='#2980b9' />
+                                    </View>
+                                }
+                                <Text semibold>drawings</Text>
+                            </TouchableOpacity>
+
                         </View>
-                        <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-                            <Text gray caption center style={styles.text}>{order.alternate_shipping_address}</Text>
-                        </View>
+                        <View style={styles.feedItem}>
+                            <View style={{ flex: 1 }}>
+                                <View style={styles.details}>
+                                    <Text style={styles.text}>Reference</Text>
+                                    <Text gray caption center style={styles.text}>{order.client_order_ref}</Text>
+                                </View>
+                                <View style={styles.details}>
+                                    <Text style={styles.text}>Customer Request</Text>
+                                    <Text gray caption center style={styles.text}>{order.customer_request}</Text>
+                                </View>
+                                <View style={styles.details}>
+                                    <Text style={styles.text}>Sharpeye Note</Text>
+                                    <Text gray caption center style={styles.text}>{order.app_memo}</Text>
+                                </View>
+                                <View style={styles.details}>
+                                    <Text style={styles.text}>Contact Name</Text>
+                                    <Text gray caption center style={styles.text}>{order.contact_name}</Text>
+                                </View>
+                                <View style={styles.details}>
+                                    <Text style={styles.text}>Contact Phone</Text>
+                                    <Text gray caption center style={styles.text}>{order.mobile}</Text>
+                                </View>
+                                <View style={styles.details}>
+                                    <Text style={styles.text}>Deliver Method</Text>
+                                    <Text gray caption center style={styles.text}>{order.delivery_method}</Text>
+                                </View>
+
+                                <View style={styles.details}>
+                                    <Text style={styles.text}>Shipping Address</Text>
+                                </View>
+                                <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+                                    <Text gray caption center style={styles.text}>{order.alternate_shipping_address}</Text>
+                                </View>
 
 
-                    </View>
-                </View>
-                <View>
-                    <FlatList
-                        data={order.order_line}
-                        renderItem={({ item }) => renderOrderLine(item)}
-                        keyExtractor={item => item.id.toString()}
-                        showsVerticalScrollIndicator={false}
-                    ></FlatList>
-                </View>
-            </View>
+                            </View>
+                        </View>
+                    </>
+                }
+                data={order.order_line}
+                renderItem={({ item }) => renderOrderLine(item)}
+                keyExtractor={item => item.id.toString()}
+                showsVerticalScrollIndicator={false}
+            ></FlatList>
+
 
         )
     };
@@ -132,16 +194,46 @@ const SearchDetails = props => {
                 source={bgImage}
                 style={styles.header}
             >
-                <Block style={{ flexDirection: 'row',justifyContent:'space-between',alignItems:'center' }}>
+                <Block style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                     <TouchableOpacity onPress={() => props.navigation.goBack()}>
                         <AntDesign name="arrowleft" size={36} color='white'></AntDesign>
                     </TouchableOpacity>
-                        <Text center h2 bold white>{order.name}</Text>
+                    <Text center h2 bold white>{order.name}</Text>
                 </Block>
             </ImageBackground>
-            <ScrollView style={styles.feed}>
+            <View style={styles.feed}>
                 {renderOrder(order)}
-            </ScrollView>
+            </View>
+
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => {
+                    Alert.alert('Modal has been closed.');
+                }}>
+                <View style={styles.centeredView}>
+                    <View style={styles.modalView}>
+
+                        {
+                            drawings?.map((drawing, index) => (
+                                <TouchableOpacity onPress={() => handleDownloadDrawing(drawing.name, drawing.base64)} key={index}>
+                                    <Text style={styles.modalText}>{drawing.name}</Text>
+                                </TouchableOpacity>
+                            ))
+                        }
+
+                        <TouchableOpacity
+                            style={{ ...styles.openButton, backgroundColor: '#2980b9' }}
+                            onPress={() => {
+                                setModalVisible(!modalVisible);
+                            }}>
+                            <Text style={styles.textStyle}>Close</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+
         </View>
     );
 
@@ -201,7 +293,46 @@ const styles = StyleSheet.create({
     text: {
         marginVertical: 6,
         alignSelf: "flex-end"
-    }
+    },
+    centeredView: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 22,
+    },
+    modalView: {
+        margin: 20,
+        backgroundColor: 'white',
+        borderRadius: 10,
+        padding: 35,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+    },
+    openButton: {
+        borderRadius: 100,
+        paddingTop: 10,
+        paddingBottom: 10,
+        paddingLeft: 20,
+        paddingRight: 20,
+        elevation: 2,
+    },
+    textStyle: {
+        color: 'white',
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+    modalText: {
+
+        marginBottom: 20,
+        textAlign: 'center',
+    },
 
 });
 
