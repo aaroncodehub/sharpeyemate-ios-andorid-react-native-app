@@ -12,7 +12,7 @@
 | ✔ react redux-thunk                         |✔ Authtentication with Firebase
 | ✔ react navigation                          |✔ Firebase Cloud Function
 | ✔ react-native-debugger.                    |✔ Realtime Database / Cloud Firestore 
-| ✔ axios                                     |✔ Odoo API  
+| ✔ axios / fetch API                         |✔ Odoo API  
 | ✔ react native                              | -           
 | ✔ css                                       | - 
 
