@@ -91,7 +91,9 @@ const Login = (props) => {
         })
     }
 
-
+const handleSignUp = () => {
+    Alert.alert('Open Account', 'please contact your salesperson', [{ text: 'OK' }]);
+}
 
     return (
         <KeyboardAvoidingView
@@ -186,7 +188,7 @@ const Login = (props) => {
                                         }
                                     </LinearGradient>
                                 </TouchableOpacity>
-                                <TouchableOpacity style={styles.signIn} onPress={() => Linking.openURL('http://sharpeye.co.nz/about.php')}>
+                                <TouchableOpacity style={styles.signIn} onPress={handleSignUp}>
                                     <Text style={styles.textSignUp}>Sign up for an account</Text>
                                 </TouchableOpacity>
                             </View>

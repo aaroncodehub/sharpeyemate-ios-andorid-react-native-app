@@ -87,7 +87,7 @@ export const fetchOrders = () => {
         const rank = getState().myReducer.userProfile.rank
         const userId = getState().myReducer.userProfile.userId
         // sharpeye user (no salesperson) access endpoint
-        if (rank == 2) {
+        if (rank == 2 || rank == 6) {
             axios({
                 url: 'https://api.sharpeye.co.nz/api/v1/model/sale.order/?limit=' + limited + '&detailed=True&domain=state,!=,cancel',
                 headers: {

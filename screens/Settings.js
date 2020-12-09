@@ -69,7 +69,7 @@ const Settings = props => {
                             thumbStyle={styles.thumb}
                             trackStyle={{ height: 6, borderRadius: 6 }}
                             minimumValue={0}
-                            maximumValue={60}
+                            maximumValue={500}
                             minimumTrackTintColor={theme.colors.secondary}
                             maximumTrackTintColor="rgba(157, 163, 180, 0.10)"
                             value={number}
