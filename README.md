@@ -18,4 +18,8 @@
 
 ## Demo
 
+<<<<<<< HEAD
 [![Sharpeye Mate](https://firebasestorage.googleapis.com/v0/b/github-c5c88.appspot.com/o/appScreenshot%2Fsharpeye-mate%2Fdemo.png?alt=media&token=b3e59148-9e0e-4fb0-9dfa-d5e4b9e96cae)](https://apps.apple.com/us/app/sharpeye-mate/id1517326189)
+=======
+[![Sharpeye Mate](https://firebasestorage.googleapis.com/v0/b/github-c5c88.appspot.com/o/appScreenshot%2Fsharpeye-mate%2Fdemo.png?alt=media&token=b3e59148-9e0e-4fb0-9dfa-d5e4b9e96cae)](https://apps.apple.com/us/app/sharpeye-mate/id1517326189)
+>>>>>>> 26f516e8b0e365d0f66e49d971c14ab47a05e210

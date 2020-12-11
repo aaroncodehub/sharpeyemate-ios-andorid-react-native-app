@@ -8,7 +8,7 @@
       "ios",
       "android"
     ],
-    "version": "7.1.0",
+    "version": "7.2.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -23,13 +23,13 @@
       "**/*"
     ],
     "ios": {
-      "buildNumber": "7.1.0",
+      "buildNumber": "7.2.0",
       "bundleIdentifier": "co.nz.sharpeye.sharpeyemate",
       "supportsTablet": true
     },
     "android": {
       "package": "co.nz.sharpeye.sharpeyemate",
-      "versionCode": 5,
+      "versionCode": 6,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png"
       },
